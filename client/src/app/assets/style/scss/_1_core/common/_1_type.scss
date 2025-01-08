@@ -1,0 +1,40 @@
+/*-------------------------------------------------------------------
+ Google Fonts
+--------------------------------------------------------------------*/
+body {
+  font-family: $font-family-sans-serif;
+}
+
+h1 {
+  font-size: $h1-font-size;
+  color: $primary;
+}
+
+h2 {
+  font-size: $h2-font-size;
+}
+
+h3 {
+  font-size: $h3-font-size;
+}
+
+h4 {
+  font-size: $h4-font-size;
+}
+
+p {
+  font-size: $font-size-base;
+  color: $gray-600;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: unset;
+}
+
+
+
+
