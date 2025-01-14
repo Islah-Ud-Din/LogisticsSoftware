@@ -4,6 +4,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(
@@ -30,19 +31,7 @@ pool.connect((err, client, release) => {
     release();
 });
 
-// Example route: Fetch all users
-app.get('/users', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM users');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
-    }
-});
-
 // Example route: Add a user
-
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body; // Destructure email and password from req.body
@@ -66,14 +55,20 @@ app.post('/api/login', async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(400).send('Error inserting user');
         }
-
         const user = result.rows[0];
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email }, // Payload
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
         // If authentication is successful, return the user data (or a token)
         res.status(200).json({
             userId: user.id,
             email: user.email,
             password: user.password,
+            token: token,
         });
     } catch (err) {
         console.error('Error:', err.message);

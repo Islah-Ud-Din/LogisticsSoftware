@@ -1,49 +1,18 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
-import useSWR from 'swr';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
+import { TextField, Button, Box, Typography } from '@mui/material';
 
 interface LoginFormValues {
     email: string;
     password: string;
 }
 
-// Custom fetcher for SWR
-const fetcher = async (key: string) => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        throw new Error('No token found');
-    }
-
-    const response = await fetch(key, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to fetch session data');
-    }
-
-    return response.json();
-};
-
 const Login: React.FC = () => {
     const router = useRouter();
-
-    // Check user session with SWR
-    const { data, error, isLoading, mutate } = useSWR('/api/session', fetcher, { shouldRetryOnError: false });
-
-    // Redirect if session is active
-    useEffect(() => {
-        if (data && !error) {
-            router.push('/dashboard');
-        }
-    }, [data, error, router]);
-
     const initialValues: LoginFormValues = {
         email: '',
         password: '',
@@ -56,8 +25,7 @@ const Login: React.FC = () => {
             password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
         }),
         onSubmit: async (values, { setSubmitting }) => {
-
-            console.log(values)
+            console.log(values);
             try {
                 const response = await fetch('http://localhost:3670/api/login', {
                     method: 'POST',
@@ -73,8 +41,9 @@ const Login: React.FC = () => {
 
                 const { token } = await response.json();
                 localStorage.setItem('authToken', token);
-
-                await mutate(); // Trigger SWR revalidation
+                if (token) {
+                    router.push('/pages/dashboard');
+                }
             } catch (err) {
                 console.error('Login error:', err);
             } finally {
@@ -84,40 +53,53 @@ const Login: React.FC = () => {
     });
 
     return (
-        <div>
-            <h1>Login</h1>
-            {isLoading && <p>Checking session...</p>}
-            {error && <p style={{ color: 'red' }}>Session expired. Please login.</p>}
+        <div className="bm-login container">
+            <div className="row">
+                <div className="col-lg-6">
+                    <Typography variant="h4" sx={{ marginBottom: 3 }}>
+                        Login
+                    </Typography>
 
-            <form onSubmit={formik.handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.email}
-                    />
-                    {formik.touched.email && formik.errors.email && <div style={{ color: 'red' }}>{formik.errors.email}</div>}
+                    <Typography sx={{ marginBottom: 3 }}>How to i get started lorem ipsum dolor at?</Typography>
+
+                    <form onSubmit={formik.handleSubmit} style={{ width: '100%', maxWidth: '400px' }}>
+                        <Box sx={{ marginBottom: 2 }}>
+                            <TextField
+                                fullWidth
+                                id="email"
+                                name="email"
+                                label="Email"
+                                variant="outlined"
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
+                            />
+                        </Box>
+                        <Box sx={{ marginBottom: 2 }}>
+                            <TextField
+                                fullWidth
+                                id="password"
+                                name="password"
+                                label="Password"
+                                type="password"
+                                variant="outlined"
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.password && Boolean(formik.errors.password)}
+                                helperText={formik.touched.password && formik.errors.password}
+                            />
+                        </Box>
+                        <Button variant="contained" color="primary" type="submit" disabled={formik.isSubmitting}>
+                            {formik.isSubmitting ? 'Logging in...' : 'Login'}
+                        </Button>
+                    </form>
                 </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.password}
-                    />
-                    {formik.touched.password && formik.errors.password && <div style={{ color: 'red' }}>{formik.errors.password}</div>}
-                </div>
-                <button type="submit" disabled={formik.isSubmitting}>
-                    {formik.isSubmitting ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+
+                <div className="col-lg-6"></div>
+            </div>
         </div>
     );
 };
