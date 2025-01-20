@@ -53,16 +53,14 @@ const Login: React.FC = () => {
     });
 
     return (
-        <div className="bm-login container">
+        <div className="login-page container-fluid">
             <div className="row">
-                <div className="col-lg-6">
+                <div className="login-content">
                     <Typography variant="h4" sx={{ marginBottom: 3 }}>
                         Login
                     </Typography>
-
-                    <Typography sx={{ marginBottom: 3 }}>How to i get started lorem ipsum dolor at?</Typography>
-
-                    <form onSubmit={formik.handleSubmit} style={{ width: '100%', maxWidth: '400px' }}>
+                    <Typography sx={{ marginBottom: 3 }}>How to get started? Lorem ipsum dolor sit amet.</Typography>
+                    <form onSubmit={formik.handleSubmit}>
                         <Box sx={{ marginBottom: 2 }}>
                             <TextField
                                 fullWidth
@@ -93,12 +91,21 @@ const Login: React.FC = () => {
                             />
                         </Box>
                         <Button variant="contained" color="primary" type="submit" disabled={formik.isSubmitting}>
-                            {formik.isSubmitting ? 'Logging in...' : 'Login'}
+                            {formik.isSubmitting ? 'Logging in...' : 'Login Now'}
                         </Button>
                     </form>
+                    <p>
+                        <span className="font-weight-bold">Login</span> with Others
+                    </p>
+                    <Box sx={{ marginTop: 2 }}>
+                        <Button fullWidth sx={{ marginBottom: 1, maxWidth: '400px' }} onClick={() => console.log('Google Login')}>
+                            Login with google
+                        </Button>
+                        <Button fullWidth  onClick={() => console.log('Facebook Login')}>
+                            Login with Facebook
+                        </Button>
+                    </Box>
                 </div>
-
-                <div className="col-lg-6"></div>
             </div>
         </div>
     );

@@ -8757,3 +8757,11 @@ Pages -> Home
 /*-------------------------------------------------------------------
 Pages -> login
 --------------------------------------------------------------------*/
+.login-page {
+  text-align: center;
+}
+.login-page .login-content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 170px 0;
+}
