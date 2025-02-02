@@ -57,10 +57,11 @@ const Login: React.FC = () => {
             <div className="row">
                 <div className="login-content">
                     <Typography variant="h4" sx={{ marginBottom: 3 }}>
-                        Login
+                        Login to your account
                     </Typography>
-                    <Typography sx={{ marginBottom: 3 }}>How to get started? Lorem ipsum dolor sit amet.</Typography>
+
                     <form onSubmit={formik.handleSubmit}>
+                        <label style={{ fontWeight: 'bold', textAlign: 'start', display: 'block', marginBottom: 4 }}>Email</label>
                         <Box sx={{ marginBottom: 2 }}>
                             <TextField
                                 fullWidth
@@ -76,6 +77,8 @@ const Login: React.FC = () => {
                             />
                         </Box>
                         <Box sx={{ marginBottom: 2 }}>
+                            <label style={{ fontWeight: 'bold', textAlign: 'start', display: 'block', marginBottom: 4 }}>Password</label>
+
                             <TextField
                                 fullWidth
                                 id="password"
@@ -101,7 +104,7 @@ const Login: React.FC = () => {
                         <Button fullWidth sx={{ marginBottom: 1, maxWidth: '400px' }} onClick={() => console.log('Google Login')}>
                             Login with google
                         </Button>
-                        <Button fullWidth  onClick={() => console.log('Facebook Login')}>
+                        <Button fullWidth onClick={() => console.log('Facebook Login')}>
                             Login with Facebook
                         </Button>
                     </Box>
