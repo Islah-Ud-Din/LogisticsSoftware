@@ -62,7 +62,7 @@ $colors: map-merge((
   "gray-dark":  $gray-800
 ), $colors);
 
-$primary:       $blue ;
+$primary:       #3F8CFF ;
 $secondary:     $primaryText ;
 $success:       $green ;
 $info:          $cyan ;
@@ -226,8 +226,8 @@ $transition-collapse:         height .35s ease ;
 // Font, line-height, and color for body text, headings, and more.
 
 // stylelint-disable value-keyword-case
-$font-family-sans-serif:     'Roboto', sans-serif;
-$font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace ;
+$font-family-sans-serif:     "Nunito Sans", serif;
+$font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Nunito Sans", serif;
 $font-family-base:            $font-family-sans-serif ;
 // stylelint-enable value-keyword-case
 
