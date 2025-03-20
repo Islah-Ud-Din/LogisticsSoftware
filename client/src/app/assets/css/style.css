@@ -8669,6 +8669,11 @@ Core -> Core
 --------------------------------------------------------------------*/
 body {
   font-family: "Nunito Sans", serif !important;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 h1 {

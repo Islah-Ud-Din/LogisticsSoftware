@@ -8,15 +8,22 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const { host } = require('pg/lib/defaults');
+const calculations = require('./calulation');
 
 const app = express();
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: 'http://localhost:3000', // Allow frontend requests
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true, // Allow cookies (for auth)
     })
 );
+
 
 app.use(express.json());
 
@@ -117,50 +124,67 @@ app.post('/api/verify-otp', async (req, res) => {
     }
 });
 
+
 // Example route: Add a user
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, password } = req.body; // Destructure email and password from req.body
+        const { email, password } = req.body;
+
+        console.log(email);
+        console.log(password);
+
 
         if (!email || !password) {
             return res.status(400).send('Email and password are required');
         }
 
-        console.log('Received email:', email);
-        console.log('Received password:', password);
+        // Find the user in the database
+        const userResult = await pool.query('SELECT * FROM login WHERE email = $1', [email]);
+        // if (userResult.rows.length === 0) {
+        //     return res.status(404).send('Account not found. Please create an account first.');
+        // }
 
-        // Hash the password before inserting into the database
-        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(email,  'database');
+        console.log(password,'database');
+        const user = userResult.rows[0];
 
-        // Query to insert user data into the 'login' table
-        const result = await pool.query('INSERT INTO login (email, password) VALUES ($1, $2) RETURNING email,password', [
-            email,
-            hashedPassword,
-        ]);
-
-        if (result.rows.length === 0) {
-            return res.status(400).send('Error inserting user');
+        // Check password
+        if (password !== user.password) {
+            return res.status(401).send('Invalid credentials');
         }
-        const user = result.rows[0];
 
-        const token = jwt.sign(
-            { userId: user.id, email: user.email }, // Payload
+        // Generate Access Token (Short-lived)
+        const accessToken = jwt.sign(
+            { userId: user.id, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '15m' } // Short lifespan for security
         );
 
-        // If authentication is successful, return the user data (or a token)
-        res.status(200).json({
-            userId: user.id,
-            email: user.email,
-            password: user.password,
-            token: token,
+        const refreshToken = jwt.sign(
+            { userId: user.id },
+            process.env.REFRESH_SECRET,
+            { expiresIn: '7d' } // Valid for 7 days
+        );
+
+        // Save Refresh Token in the database (optional)
+        await pool.query('UPDATE login SET refresh_token = $1 WHERE id = $2', [refreshToken, user.id]);
+
+        // Set Refresh Token as HTTP-only cookie
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'dev',
+            sameSite: 'Strict',
+            path: '/api/refresh-token',
         });
+
+        // Send back only the access token
+        res.status(200).json({ accessToken });
     } catch (err) {
         console.error('Error:', err.message);
         res.status(500).send('Server error');
     }
 });
+
 
 // Start the server
 const PORT = process.env.PORT;

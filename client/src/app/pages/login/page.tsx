@@ -6,6 +6,12 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
+// Context
+import { useUser } from '@/context/UserContext';
+
+// Custom Hook
+import { useApi } from '../../../hooks/useApi';
+
 interface LoginFormValues {
     email: string;
     password: string;
@@ -13,6 +19,9 @@ interface LoginFormValues {
 
 const Login: React.FC = () => {
     const router = useRouter();
+    const { setAuthToken } = useUser();
+    const { postRequest } = useApi(); // Using useApi hook
+
     const initialValues: LoginFormValues = {
         email: '',
         password: '',
@@ -25,25 +34,18 @@ const Login: React.FC = () => {
             password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
         }),
         onSubmit: async (values, { setSubmitting }) => {
-            console.log(values);
+            console.log('Form Values:', values);
+
             try {
-                const response = await fetch('http://localhost:3670/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
-                });
+                const response = await postRequest<{ accessToken: string }>('/api/login', values);
 
-                if (!response.ok) {
-                    throw new Error('Invalid email or password');
-                }
-
-                const { token } = await response.json();
-                localStorage.setItem('authToken', token);
-                if (token) {
+                if (response.accessToken) {
+                    setAuthToken(response.accessToken);
+                    localStorage.setItem('authToken', response.accessToken);
                     router.push('/pages/dashboard');
                 }
+
+                console.log(response);
             } catch (err) {
                 console.error('Login error:', err);
             } finally {
@@ -102,7 +104,7 @@ const Login: React.FC = () => {
                     </p>
                     <Box sx={{ marginTop: 2 }}>
                         <Button fullWidth sx={{ marginBottom: 1, maxWidth: '400px' }} onClick={() => console.log('Google Login')}>
-                            Login with google
+                            Login with Google
                         </Button>
                         <Button fullWidth onClick={() => console.log('Facebook Login')}>
                             Login with Facebook
