@@ -1,11 +1,11 @@
-<svg width="36" height="37" viewBox="0 0 36 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="-7" y="-6" width="50" height="50" rx="12" fill="white"/>
-<mask id="mask0_996_30233" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-7" y="-6" width="50" height="50">
-<rect x="-7" y="-6" width="50" height="50" rx="12" fill="white"/>
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="50" height="50" rx="12" fill="white"/>
+<mask id="mask0_992_3515" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="50" height="50">
+<rect width="50" height="50" rx="12" fill="white"/>
 </mask>
-<g mask="url(#mask0_996_30233)">
+<g mask="url(#mask0_992_3515)">
 </g>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M10.9999 19C9.3499 19 8 17.6501 8 16.0002C8 14.3499 9.3499 13 10.9999 13C12.6499 13 14 14.3499 14 16.0002C14 17.6501 12.6499 19 10.9999 19Z" fill="#3F8CFF"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M36 12.3448C36 7.20515 31.725 3 26.5 3C21.2752 3 17 7.20515 17 12.3448V26C17 26 35.9983 23.9193 36 12.346V12.3448Z" fill="#00255B"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M7 31.2076C5.98815 31.2076 5.16052 30.4388 5.16052 29.4993C5.16052 28.5596 5.98815 27.791 7 27.791C8.01162 27.791 8.83925 28.5596 8.83925 29.4993C8.83925 30.4388 8.01162 31.2076 7 31.2076ZM0 29.4978C0 29.4982 0 29.4989 0 29.4993C0 33.0746 3.14989 36 7 36C10.8499 36 14 33.0746 14 29.4993V20C14 20 0.00183306 21.4474 0 29.4978Z" fill="#FFC10B"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.9999 25C16.3499 25 15 23.6501 15 22.0002C15 20.3499 16.3499 19 17.9999 19C19.6499 19 21 20.3499 21 22.0002C21 23.6501 19.6499 25 17.9999 25Z" fill="#3F8CFF"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M43 18.3448C43 13.2052 38.725 9 33.5 9C28.2752 9 24 13.2052 24 18.3448V32C24 32 42.9983 29.9193 43 18.346V18.3448Z" fill="#00255B"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14 37.2076C12.9882 37.2076 12.1605 36.4388 12.1605 35.4993C12.1605 34.5596 12.9882 33.791 14 33.791C15.0116 33.791 15.8392 34.5596 15.8392 35.4993C15.8392 36.4388 15.0116 37.2076 14 37.2076ZM7 35.4978C7 35.4982 7 35.4989 7 35.4993C7 39.0746 10.1499 42 14 42C17.8499 42 21 39.0746 21 35.4993V26C21 26 7.00183 27.4474 7 35.4978Z" fill="#FFC10B"/>
 </svg>

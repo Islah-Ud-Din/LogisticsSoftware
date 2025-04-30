@@ -24,7 +24,6 @@ app.use(
     })
 );
 
-
 app.use(express.json());
 
 // PostgreSQL connection pool
@@ -52,75 +51,54 @@ const transporter = nodemailer.createTransport({
 
 // API Register Endpoint
 app.post('/api/register', async (req, res) => {
+    const { firstName, lastName, email, password, country } = req.body;
+
+    if (!firstName || !lastName || !email || !password || !country) {
+        return res.status(400).json({ message: 'All fields are required!' });
+    }
+
     try {
-        const { email, password } = req.body;
+        const userExist = await pool.query('SELECT * FROM register_users WHERE email = $1', [email]);
 
-        if (!email || !password) {
-            return res.status(400).send('Email and password are required');
-        }
-
-        // Check if user already exists
-        const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (existingUser.rows.length > 0) {
-            return res.status(400).send('User already exists');
+        if (userExist.rows.length > 0) {
+            return res.status(400).json({ message: 'Email already in use!' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = crypto.randomBytes(3).toString('hex');
-        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins expiry
 
-        await pool.query('INSERT INTO users (email, password, otp, otp_expiry, is_verified) VALUES ($1, $2, $3, $4, $5)', [
-            email,
-            hashedPassword,
-            otp,
-            otpExpiry,
-            false,
-        ]);
+        // Insert into DB with OTP + expiry + is_verified = false
+        await pool.query(
+            `INSERT INTO register_users
+             (first_name, last_name, email, password, country, otp, otp_expiry, is_verified)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [
+                firstName,
+                lastName,
+                email,
+                hashedPassword,
+                country,
+                otp,
+                otpExpiry,
+                false,
+            ]
+        );
 
-        // Send OTP email
+        // Send OTP
         const mailOptions = {
-            from: 'your-email@gmail.com',
+            from: 'islahuddin795@gmail.com',
             to: email,
-            subject: 'Your OTP Code',
-            text: `Your OTP code is: ${otp}`,
+            subject: 'Your Verification OTP',
+            text: `Hi ${firstName},\n\nYour OTP for email verification is: ${otp}\n\nIt expires in 10 minutes.`,
         };
 
         await transporter.sendMail(mailOptions);
 
-        res.status(200).json({ message: 'Registration successful. Check your email for the OTP.' });
-    } catch (err) {
-        console.error('Error:', err.message);
-        res.status(500).send('Server error');
-    }
-});
-
-// API Verify Token Endpoint
-app.post('/api/verify-otp', async (req, res) => {
-    const { email, token } = req.body;
-
-    try {
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = result.rows[0];
-
-        if (!user) {
-            return res.status(400).send('User not found');
-        }
-
-        if (user.otp !== token) {
-            return res.status(400).send('Invalid OTP');
-        }
-
-        const currentTime = new Date();
-        if (currentTime > new Date(user.otp_expiry)) {
-            return res.status(400).send('OTP has expired');
-        }
-
-        // OTP is valid
-        await pool.query('UPDATE users SET is_verified = $1, otp = NULL, otp_expiry = NULL WHERE email = $2', [true, email]);
-        res.status(200).json({ message: 'Email verified successfully. Registration complete.' });
-    } catch (err) {
-        console.error('Error:', err.message);
-        res.status(500).send('Server error');
+        res.status(200).json({ message: 'Registration successful! Please verify your email.' });
+    } catch (error) {
+        console.error("Registration error:", error.message);
+        res.status(500).json({ message: 'Registration failed. Please try again.' });
     }
 });
 
@@ -130,60 +108,99 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        console.log(email);
-        console.log(password);
-
-
         if (!email || !password) {
-            return res.status(400).send('Email and password are required');
+            return res.status(400).json({ message: 'Email and password are required' });
         }
 
-        // Find the user in the database
-        const userResult = await pool.query('SELECT * FROM login WHERE email = $1', [email]);
-        // if (userResult.rows.length === 0) {
-        //     return res.status(404).send('Account not found. Please create an account first.');
-        // }
+        // Check if user exists in the register_users table
+        const userResult = await pool.query('SELECT * FROM register_users WHERE email = $1', [email]);
 
-        console.log(email,  'database');
-        console.log(password,'database');
+        // ❌ Email not found
+        if (userResult.rows.length === 0) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'Account does not exist. Please create an account.' });
+        }
+
         const user = userResult.rows[0];
+        console.log('User found:', user); // Debugging output
 
-        // Check password
-        if (password !== user.password) {
-            return res.status(401).send('Invalid credentials');
+        // ❌ Password doesn't match (compare hashed password)
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        console.log('Password Match:', passwordMatch); // Debugging output
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Generate Access Token (Short-lived)
-        const accessToken = jwt.sign(
-            { userId: user.id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '15m' } // Short lifespan for security
-        );
+        // ✅ Generate Access Token
+        const accessToken = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '15m' });
 
-        const refreshToken = jwt.sign(
-            { userId: user.id },
-            process.env.REFRESH_SECRET,
-            { expiresIn: '7d' } // Valid for 7 days
-        );
+        const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_SECRET, { expiresIn: '7d' });
 
-        // Save Refresh Token in the database (optional)
-        await pool.query('UPDATE login SET refresh_token = $1 WHERE id = $2', [refreshToken, user.id]);
+        // Optionally save the refresh token
+        await pool.query('UPDATE register_users SET refresh_token = $1 WHERE id = $2', [refreshToken, user.id]);
+        console.log('Updated refresh token for user:', user.id); // Debugging output
 
-        // Set Refresh Token as HTTP-only cookie
+        // Set refresh token in HTTP-only cookie
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'dev',
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'Strict',
             path: '/api/refresh-token',
         });
 
-        // Send back only the access token
+        // ✅ Return access token
         res.status(200).json({ accessToken });
     } catch (err) {
-        console.error('Error:', err.message);
-        res.status(500).send('Server error');
+        console.error('Login error:', err.message);
+        res.status(500).json({ message: 'Server error' });
     }
 });
+
+
+
+// API Verify Token Endpoint
+app.post('/api/verify-otp', async (req, res) => {
+    const { email, token } = req.body;
+
+    console.log('Email received:', email); // Log email to verify input
+
+    try {
+        // Query to get the OTP and OTP expiry date from the DB
+        const { rows } = await pool.query('SELECT otp, otp_expiry FROM register_users WHERE email = $1', [email]);
+
+        if (rows.length === 0) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        const user = rows[0];
+
+        console.log('User retrieved from DB:', user); // Log the user data for debugging
+
+        // If OTP from DB doesn't match the provided token
+        if (user.otp !== token) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        // Check if OTP has expired
+        if (new Date() > new Date(user.otp_expiry)) {
+            return res.status(400).json({ message: 'OTP has expired' });
+        }
+
+        // Update user as verified and clear OTP
+        await pool.query(
+            'UPDATE register_users SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE email = $1',
+            [email]
+        );
+
+        res.status(200).json({ message: 'OTP verified successfully' });
+    } catch (err) {
+        // Log the full error message for debugging
+        console.error('OTP verify error:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 
 // Start the server

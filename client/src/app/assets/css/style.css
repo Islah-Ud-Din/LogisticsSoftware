@@ -8774,14 +8774,35 @@ Pages -> login
 /*-------------------------------------------------------------------
 Pages -> login
 --------------------------------------------------------------------*/
-.signin-page .container {
+.signup-page .container {
   padding: 120px 0;
 }
-.signin-page .signin-left {
-  background: #3F8CFF;
-  padding: 50px;
-  border-radius: 10px;
+.signup-page .signup-left {
+  background: -webkit-gradient(linear, left top, left bottom, from(#050505), to(#1570ef));
+  background: linear-gradient(to bottom, #050505, #1570ef);
+  padding: 40px 30px 0;
+  border-radius: 20px;
 }
-.signin-page h1 {
+.signup-page .signup-left h2,
+.signup-page .signup-left h3 {
+  color: #fff;
+  font-weight: bolder;
+}
+.signup-page .signup-left .sl-logo {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 30px;
+}
+.signup-page .signup-left .sl-logo img {
+  margin-right: 15px;
+}
+.signup-page .signup-right {
+  padding: 40px 0;
+}
+.signup-page h1 {
   color: #fff;
 }
