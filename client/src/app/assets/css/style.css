@@ -8674,11 +8674,12 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  background-color: #f5f5f5;
 }
 
 h1 {
   font-size: 3.75rem;
-  color: #3F8CFF;
+  color: #3f8cff;
 }
 
 h2 {
@@ -8718,6 +8719,20 @@ Components -> Components
 /*-------------------------------------------------------------------
  Component-> Header
 --------------------------------------------------------------------*/
+.bpo-header {
+  background-color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 0 20px;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
 /*-------------------------------------------------------------------
  Component-> Footer
 --------------------------------------------------------------------*/
@@ -8731,12 +8746,29 @@ Pages -> Home -> Banner
 Pages -> Home -> Card
 --------------------------------------------------------------------*/
 .card {
-  padding: 35px 11px 0;
+  padding: 30px 15px 0;
   height: 100%;
   border-radius: 20px;
+  margin-right: 20px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.card:last-child {
+  margin-right: 0;
 }
 .card:hover {
   background-color: #e2f1fc;
+  border-radius: 20px;
+  border: 1px solid #3f8cff;
+}
+.card .card-head {
+  color: #3f8cff;
+  font-size: 18px;
+}
+.card .card-amount {
+  font-weight: 700;
+  font-size: 35px;
+  color: #00255b;
 }
 .card .card-img-top {
   width: 100px;
@@ -8756,6 +8788,33 @@ utilities -> utilities
 /*-------------------------------------------------------------------
  Pages-> Pages
 --------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+Pages -> Dashboard
+--------------------------------------------------------------------*/
+.bpo-dashboard .dashboard-head {
+  margin-top: 30px;
+}
+.bpo-dashboard .card-section {
+  padding: 20px 0;
+}
+.bpo-dashboard .bpo-section .row {
+  gap: 20px;
+}
+.bpo-dashboard .bpo-section .bpo-left,
+.bpo-dashboard .bpo-section .bpo-right {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+.bpo-dashboard .bpo-section .bpo-left .bpo-heading,
+.bpo-dashboard .bpo-section .bpo-right .bpo-heading {
+  color: #3f8cff;
+  font-size: 1rem;
+}
+
 /*-------------------------------------------------------------------
 Pages -> Home
 --------------------------------------------------------------------*/

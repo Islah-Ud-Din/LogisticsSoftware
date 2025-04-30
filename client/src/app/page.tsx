@@ -4,7 +4,7 @@ import Login from '@/app/pages/login/page';
 
 export default function Home() {
     return (
-        <main className="">
+        <main className="" style={{ minHeight: '100vh' }}>
             <Login />
             {/* <LoginFrom /> */}
         </main>

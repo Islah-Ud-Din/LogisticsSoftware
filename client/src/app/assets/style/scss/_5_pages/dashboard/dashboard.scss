@@ -1,0 +1,39 @@
+/*-------------------------------------------------------------------
+Pages -> Dashboard
+--------------------------------------------------------------------*/
+.bpo-dashboard {
+    .dashboard-head {
+        margin-top: 30px;
+    }
+
+    // Bpo Content
+    .bpo-content {
+    }
+
+    // Card Section
+    .card-section {
+        padding: 20px 0;
+    }
+
+    // Business Performance Overview
+    .bpo-section {
+        .row {
+            gap: 20px;
+        }
+
+
+        .bpo-left,
+        .bpo-right {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            flex: 1;
+
+            .bpo-heading{
+                color: $primary;
+                font-size: 1rem;
+
+            }
+        }
+    }
+}

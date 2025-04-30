@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>
+            <body style={{ minHeight: '100vh' }}>
                 {/* <HeaderFunc /> */}
                 <UserProvider>{children}</UserProvider>
             </body>

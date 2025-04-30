@@ -115,7 +115,6 @@ app.post('/api/login', async (req, res) => {
         // Check if user exists in the register_users table
         const userResult = await pool.query('SELECT * FROM register_users WHERE email = $1', [email]);
 
-        // ❌ Email not found
         if (userResult.rows.length === 0) {
             console.log('User not found');
             return res.status(404).json({ message: 'Account does not exist. Please create an account.' });
@@ -124,7 +123,6 @@ app.post('/api/login', async (req, res) => {
         const user = userResult.rows[0];
         console.log('User found:', user); // Debugging output
 
-        // ❌ Password doesn't match (compare hashed password)
         const passwordMatch = await bcrypt.compare(password, user.password);
         console.log('Password Match:', passwordMatch); // Debugging output
 
@@ -132,7 +130,6 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // ✅ Generate Access Token
         const accessToken = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '15m' });
 
         const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_SECRET, { expiresIn: '7d' });

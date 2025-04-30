@@ -20,7 +20,7 @@ import Logo from '../../assets/images/svg/logo.svg';
 
 const { Option } = Select;
 
-const SignUpPage = () => {
+const ContactUs = () => {
     // router
     const router = useRouter();
 
@@ -176,4 +176,4 @@ const SignUpPage = () => {
     );
 };
 
-export default SignUpPage;
+export default ContactUs;
