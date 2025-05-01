@@ -1,16 +1,21 @@
 'use client';
 
 import React from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { TextField, Button, Box, Typography, Link } from '@mui/material';
+import { Form, Input, Button, Typography, message, Checkbox } from 'antd';
 
 // Context
 import { useUser } from '@/context/UserContext';
 
 // Custom Hook
 import { useApi } from '../../../hooks/useApi';
+
+// Assets
+import MainMockup from '../../assets/images/svg/login.svg';
+import Logo from '../../assets/images/svg/logo.svg';
+
+const { Title, Link } = Typography;
 
 interface LoginFormValues {
     email: string;
@@ -22,112 +27,98 @@ const Login: React.FC = () => {
     const { setAuthToken } = useUser();
     const { postRequest } = useApi();
 
-    const initialValues: LoginFormValues = {
-        email: '',
-        password: '',
+    const handleLogin = async (values: LoginFormValues) => {
+        try {
+            const response = await postRequest<{ accessToken: string }>('/api/login', values);
+
+            if (response.accessToken) {
+                setAuthToken(response.accessToken);
+                localStorage.setItem('authToken', response.accessToken);
+                router.push('/pages/dashboard');
+            }
+        } catch (err: any) {
+            if (err?.response?.status === 404 || err?.response?.data?.message === 'User not found') {
+                message.error('Account does not exist. Please create an account.');
+            } else if (err?.response?.data?.message) {
+                message.error(err.response.data.message);
+            } else {
+                message.error('An unexpected error occurred. Please try again.');
+            }
+        }
     };
 
-    const formik = useFormik<LoginFormValues>({
-        initialValues,
-        validationSchema: Yup.object({
-            email: Yup.string().email('Invalid email format').required('Email is required'),
-            password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-        }),
-        onSubmit: async (values, { setSubmitting, setStatus }) => {
-            try {
-                const response = await postRequest<{ accessToken: string }>('/api/login', values);
-
-                if (response.accessToken) {
-                    setAuthToken(response.accessToken);
-                    localStorage.setItem('authToken', response.accessToken);
-                    router.push('/pages/dashboard');
-                }
-            } catch (err: any) {
-                if (err?.response?.status === 404 || err?.response?.data?.message === 'User not found') {
-                    setStatus('Account does not exist. Please create an account.');
-                } else if (err?.response?.data?.message) {
-                    setStatus(err.response.data.message);
-                } else {
-                    setStatus('An unexpected error occurred. Please try again.');
-                }
-            } finally {
-                setSubmitting(false);
-            }
-        },
-    });
-
     return (
-        <div className="login-page container-fluid">
-            <div className="row">
-                <div className="login-content">
-                    <Typography variant="h4" sx={{ marginBottom: 3 }}>
-                        Login to your account
-                    </Typography>
+        <div className="signup-page">
+            <div className="container">
+                <div className="row align-items-center">
+                    <div className="col-lg-6 signup-left mb-5 mb-lg-0" style={{ paddingRight: '40px' }}>
+                        <div className="sl-logo d-flex align-items-center mb-3">
+                            <Image className="img-fluid" src={Logo} alt="Logo" width={40} height={40} />
+                            <h3 style={{ marginLeft: '10px' }}>TravelSol</h3>
+                        </div>
 
-                    <form onSubmit={formik.handleSubmit}>
-                        <label style={{ fontWeight: 'bold', textAlign: 'start', display: 'block', marginBottom: 4 }}>Email</label>
-                        <Box sx={{ marginBottom: 2 }}>
-                            <TextField
-                                fullWidth
-                                id="email"
+                        <h2 className="mb-5">Your place to work, Plan, Create, Control</h2>
+                        <Image className="img-fluid" src={MainMockup} alt="Main" width={500} height={500} />
+                    </div>
+
+                    <div className="col-lg-6 login-content" style={{ paddingLeft: '40px', maxWidth: '500px', width: '100%' }}>
+                        <Title level={4} style={{ textAlign: 'center', marginBottom: '32px' }}>
+                            Login to Your Account
+                        </Title>
+
+                        <Form layout="vertical" onFinish={handleLogin}>
+                            <Form.Item
+                                label="Email Address"
                                 name="email"
-                                label="Email"
-                                variant="outlined"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
-                            />
-                        </Box>
+                                rules={[
+                                    { required: true, message: 'Email is required' },
+                                    { type: 'email', message: 'Invalid email format' },
+                                ]}
+                            >
+                                <Input placeholder="youremail@gmail.com" size="large" />
+                            </Form.Item>
 
-                        <label style={{ fontWeight: 'bold', textAlign: 'start', display: 'block', marginBottom: 4 }}>Password</label>
-                        <Box sx={{ marginBottom: 2 }}>
-                            <TextField
-                                fullWidth
-                                id="password"
-                                name="password"
+                            <Form.Item
                                 label="Password"
-                                type="password"
-                                variant="outlined"
-                                value={formik.values.password}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.password && Boolean(formik.errors.password)}
-                                helperText={formik.touched.password && formik.errors.password}
-                            />
-                        </Box>
+                                name="password"
+                                rules={[
+                                    { required: true, message: 'Password is required' },
+                                    { min: 6, message: 'Password must be at least 6 characters' },
+                                ]}
+                            >
+                                <Input.Password placeholder="Enter your password" size="large" />
+                            </Form.Item>
 
-                        <Button variant="contained" color="primary" type="submit" disabled={formik.isSubmitting}>
-                            {formik.isSubmitting ? 'Logging in...' : 'Login Now'}
-                        </Button>
+                            <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 16 }}>
+                                <Checkbox>Remember me</Checkbox>
+                            </Form.Item>
 
-                        {formik.status && (
-                            <Box sx={{ mt: 2 }}>
-                                <Typography variant="body2" color="error">
-                                    {formik.status}
-                                </Typography>
-                            </Box>
-                        )}
-                        <Box sx={{ mt: 2 }}>
-                            <Link href="/pages/SignUp" underline="hover" sx={{ display: 'block', mt: 1 }}>
-                                Don’t have an account? Sign up here.
-                            </Link>
-                        </Box>
-                    </form>
+                            <Form.Item>
+                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                    <Button type="primary" htmlType="submit" size="large">
+                                        Login
+                                    </Button>
+                                </div>
+                            </Form.Item>
 
-                    <p style={{ marginTop: '20px' }}>
-                        <span className="font-weight-bold">Login</span> with Others
-                    </p>
+                            <Form.Item style={{ textAlign: 'center' }}>
+                                <Link href="/pages/SignUp">Don’t have an account? Sign up here.</Link>
+                            </Form.Item>
+                        </Form>
 
-                    <Box sx={{ marginTop: 2 }}>
-                        <Button fullWidth sx={{ marginBottom: 1, maxWidth: '400px' }} onClick={() => console.log('Google Login')}>
-                            Login with Google
-                        </Button>
-                        <Button fullWidth onClick={() => console.log('Facebook Login')}>
-                            Login with Facebook
-                        </Button>
-                    </Box>
+                        <p style={{ marginTop: '20px', textAlign: 'center' }}>
+                            <strong>Login</strong> with Others
+                        </p>
+
+                        <div style={{ marginTop: 16, maxWidth: 400, marginInline: 'auto' }}>
+                            <Button block style={{ marginBottom: 8 }} size="large" onClick={() => console.log('Google Login')}>
+                                Login with Google
+                            </Button>
+                            <Button block size="large" onClick={() => console.log('Facebook Login')}>
+                                Login with Facebook
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
