@@ -16,6 +16,7 @@ import {
     ArcElement,
     Legend,
 } from 'chart.js';
+import { ArrowUpOutlined, ArrowRightOutlined, ArrowDownOutlined } from '@ant-design/icons';
 
 // Components
 import HeaderFunc from '@/app/components/Header/header';
@@ -26,8 +27,27 @@ import useAuth from '@/hooks/useAuth';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, ArcElement);
-
+const stocks = [
+    { name: 'Opzelura', current: 30, max: 100 },
+    { name: 'Abilify', current: 60, max: 100 },
+    { name: 'Chlorthalidone', current: 90, max: 100 },
+    { name: 'Zofran', current: 40, max: 100 },
+    { name: 'Gabapentin', current: 10, max: 100 },
+    { name: 'Lisinopril', current: 85, max: 100 },
+    { name: 'Atorvastatin', current: 75, max: 100 },
+    { name: 'Metformin', current: 50, max: 100 },
+    { name: 'Albuterol', current: 20, max: 100 },
+    { name: 'Omeprazole', current: 95, max: 100 },
+    { name: 'Levothyroxine', current: 45, max: 100 },
+    { name: 'Amlodipine', current: 65, max: 100 },
+    { name: 'Sertraline', current: 15, max: 100 },
+    { name: 'Simvastatin', current: 80, max: 100 },
+    { name: 'Losartan', current: 55, max: 100 },
+];
 const DashBoard = () => {
+    // States
+    const [showAll, setShowAll] = useState(false);
+    const visibleStocks = showAll ? stocks : stocks.slice(0, 5);
     const authToken = useAuth();
 
     if (!authToken) {
@@ -151,6 +171,39 @@ const DashBoard = () => {
             color: 'text-yellow-500',
         },
     ];
+
+    const getStockStatus = (percent) => {
+        if (percent > 70) return 'bg-primary';
+        if (percent >= 30) return 'bg-secondary';
+        return 'bg-danger';
+    };
+
+    const getStockLabel = (percent) => {
+        if (percent > 85)
+            return (
+                <>
+                    High <ArrowUpOutlined />
+                </>
+            );
+        if (percent >= 50)
+            return (
+                <>
+                    Medium <ArrowRightOutlined />
+                </>
+            );
+        return (
+            <>
+                Low <ArrowDownOutlined />
+            </>
+        );
+    };
+
+    const getTextColorClass = (percent) => {
+        if (percent > 70) return 'text-primary';
+        if (percent >= 30) return 'text-secondary';
+        return 'text-danger';
+    };
+
     return (
         <div className="bpo-dashboard">
             <HeaderFunc />
@@ -170,15 +223,18 @@ const DashBoard = () => {
                     {/* DashBoard Content */}
                     <div className="dashboard-content">
                         <div className="row">
+                            {/* Avaliable Stocks */}
                             <div className="col-lg-8">
                                 {/* Card */}
                                 <div className="card-section">
                                     <div className="row">
                                         {cards.map((card, index) => (
-                                            <div key={index} className="card card-item">
-                                                <h3 className="card-head">{card.title}</h3>
-                                                <h2 className="card-amount">{card.amount}</h2>
-                                                <p className={`text-sm font-semibold ${card.color}`}>{card.change}</p>
+                                            <div key={index} className="col-lg-3 mb-3">
+                                                <div className="card card-item">
+                                                    <h3 className="card-head">{card.title}</h3>
+                                                    <h2 className="card-amount">{card.amount}</h2>
+                                                    <p className={`text-sm font-semibold mb-0 ${card.color}`}>{card.change}</p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -188,36 +244,81 @@ const DashBoard = () => {
                                 {/* Business Performance Overview */}
                                 <div className="bpo-section">
                                     <div className="row">
-                                        <div className="bpo-left col-lg-6" style={{ margin: '0 auto', marginBottom: '2rem' }}>
-                                            <h4 className="bpo-heading">Total Import</h4>
-                                            <p>Explore on-chain funds deployed by the community, or create your own.</p>
-                                            <Bar data={barData} options={barOptions} />
+                                        <div className="col-lg-6">
+                                            <div className="bpo-left">
+                                                <h4 className="bpo-heading">Total Import</h4>
+                                                <p>Explore on-chain funds deployed by the community, or create your own.</p>
+                                                <Bar data={barData} options={barOptions} />
+                                            </div>
                                         </div>
 
-                                        <div className="bpo-right col-lg-6" style={{ marginBottom: '2rem' }}>
-                                            <h4 className="bpo-heading">Total Sale</h4>
-                                            <p>Explore on-chain funds deployed by the community, or create your own.</p>
-                                            <Pie
-                                                style={{ margin: '0 auto' }}
-                                                data={pieData}
-                                                width={300}
-                                                height={300}
-                                                options={{
-                                                    responsive: false,
-                                                    maintainAspectRatio: false,
-                                                }}
-                                            />
+                                        <div className="col-lg-6">
+                                            <div className="bpo-right">
+                                                <h4 className="bpo-heading">Total Sale</h4>
+                                                <p>Explore on-chain funds deployed by the community, or create your own.</p>
+                                                <Pie
+                                                    data={pieData}
+                                                    width={300}
+                                                    height={250}
+                                                    options={{
+                                                        responsive: false,
+                                                        maintainAspectRatio: false,
+                                                        plugins: {
+                                                            legend: {
+                                                                position: 'right',
+                                                                labels: {
+                                                                    usePointStyle: true,
+                                                                    padding: 20,
+                                                                },
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
+                                    </div>
+
+                                    <div className="line-chart">
+                                        <h3>Business Performance Overview</h3>
                                         <Line data={lineData} options={lineOptions} />
                                     </div>
                                 </div>
                                 {/* Business Performance Overview */}
                             </div>
+                            {/* Avaliable Stocks */}
+
+                            {/* Avaliable Stocks */}
                             <div className="col-lg-4">
-                                <div style={{ width: '50%', margin: '0 auto' }}>
-                                    <h2> Available Stocks</h2>
+                                <div className="as-wrapper">
+                                    <div className="asw-header">
+                                        <h2 className="asw-text">Available Stocks</h2>
+                                        <button className="btn btn-link  mt-2" onClick={() => setShowAll(!showAll)}>
+                                            {showAll ? 'Show Less' : 'View All Stocks'}
+                                        </button>
+                                    </div>
+
+                                    {visibleStocks.map((stock, idx) => {
+                                        const percent = (stock.current / stock.max) * 100;
+                                        return (
+                                            <div key={idx} className="asw-bars mb-3">
+                                                <h5>{stock.name}</h5>
+                                                <div className="progress">
+                                                    <div
+                                                        className={`progress-bar ${getStockStatus(percent)}`}
+                                                        role="progressbar"
+                                                        style={{ width: `${percent}%` }}
+                                                        aria-valuenow={stock.current}
+                                                        aria-valuemin="0"
+                                                        aria-valuemax={stock.max}
+                                                    ></div>
+                                                </div>
+                                                <p className={`pb-text ${getTextColorClass(percent)}`}>{getStockLabel(percent)}</p>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
+                            {/* Avaliable Stocks */}
                         </div>
                     </div>
                     {/* DashBoard Content */}

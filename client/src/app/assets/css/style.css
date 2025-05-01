@@ -8746,28 +8746,30 @@ Pages -> Home -> Banner
 Pages -> Home -> Card
 --------------------------------------------------------------------*/
 .card {
-  padding: 30px 15px 0;
+  padding: 17px 13px;
   height: 100%;
   border-radius: 20px;
-  margin-right: 20px;
   border: 1px solid transparent;
   cursor: pointer;
-}
-.card:last-child {
-  margin-right: 0;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
 }
 .card:hover {
   background-color: #e2f1fc;
-  border-radius: 20px;
   border: 1px solid #3f8cff;
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+  -webkit-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 .card .card-head {
   color: #3f8cff;
-  font-size: 18px;
+  font-size: 1rem;
 }
 .card .card-amount {
   font-weight: 700;
-  font-size: 35px;
+  font-size: 2rem;
   color: #00255b;
 }
 .card .card-img-top {
@@ -8794,25 +8796,52 @@ Pages -> Dashboard
 .bpo-dashboard .dashboard-head {
   margin-top: 30px;
 }
-.bpo-dashboard .card-section {
-  padding: 20px 0;
-}
-.bpo-dashboard .bpo-section .row {
-  gap: 20px;
-}
 .bpo-dashboard .bpo-section .bpo-left,
 .bpo-dashboard .bpo-section .bpo-right {
   background-color: #fff;
   padding: 20px;
   border-radius: 20px;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  margin-bottom: 10px;
 }
 .bpo-dashboard .bpo-section .bpo-left .bpo-heading,
 .bpo-dashboard .bpo-section .bpo-right .bpo-heading {
   color: #3f8cff;
   font-size: 1rem;
+}
+.bpo-dashboard .bpo-section .line-chart {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+}
+.bpo-dashboard .as-wrapper {
+  background: #fff;
+  padding: 25px;
+  border-radius: 25px;
+  margin: 0 15px;
+}
+.bpo-dashboard .as-wrapper .asw-text {
+  color: #00255B;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.bpo-dashboard .as-wrapper .asw-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.bpo-dashboard .as-wrapper .asw-bars h5 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #00255B;
+}
+.bpo-dashboard .as-wrapper .asw-bars .pb-text {
+  font-weight: bold;
 }
 
 /*-------------------------------------------------------------------

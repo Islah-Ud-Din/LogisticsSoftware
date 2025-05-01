@@ -6,34 +6,58 @@ Pages -> Dashboard
         margin-top: 30px;
     }
 
-    // Bpo Content
-    .bpo-content {
-    }
-
-    // Card Section
-    .card-section {
-        padding: 20px 0;
-    }
-
     // Business Performance Overview
     .bpo-section {
-        .row {
-            gap: 20px;
-        }
-
-
         .bpo-left,
         .bpo-right {
             background-color: #fff;
             padding: 20px;
             border-radius: 20px;
-            flex: 1;
+            margin-bottom: 10px;
 
-            .bpo-heading{
+            .bpo-heading {
                 color: $primary;
                 font-size: 1rem;
-
             }
+        }
+
+        .line-chart {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+        }
+    }
+
+    // Avaliable stocks
+    .as-wrapper {
+        background: $white;
+        padding: 25px;
+        border-radius: 25px;
+        margin: 0 15px;
+
+        .asw-text {
+            color: $secondary;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .asw-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asw-bars {
+            h5 {
+                font-size: 1rem;
+                font-weight: bold;
+                color: $secondary;
+            }
+
+            .pb-text {
+                font-weight: bold;
+            }
+
         }
     }
 }

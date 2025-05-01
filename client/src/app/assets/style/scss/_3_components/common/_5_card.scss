@@ -3,30 +3,29 @@ Pages -> Home -> Card
 --------------------------------------------------------------------*/
 
 .card {
-    padding: 30px 15px 0;
+    padding: 17px 13px;
     height: 100%;
     border-radius: 20px;
-    margin-right: 20px;
     border: 1px solid transparent;
     cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
 
-    &:last-child {
-        margin-right: 0;
-    }
     &:hover {
         background-color: #e2f1fc;
-        border-radius: 20px;
         border: 1px solid $primary;
+        transform: scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
 
     .card-head {
         color: $primary;
-        font-size: 18px;
+        font-size: 1rem;
     }
 
     .card-amount {
         font-weight: $font-weight-bold;
-        font-size: 35px;
+        font-size: 2rem;
         color: #00255b;
     }
 
