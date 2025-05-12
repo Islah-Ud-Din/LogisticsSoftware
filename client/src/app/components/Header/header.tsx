@@ -20,6 +20,7 @@ function BpoHeader() {
         { key: '1', label: 'Home', path: '/pages/dashboard' },
         { key: '2', label: 'Sales', path: '/pages/sales' },
         { key: '3', label: 'Purchase', path: '/pages/purchase' },
+        { key: '4', label: 'Contact', path: '/pages/contact' },
     ];
 
     // Determine which key is active based on current pathname

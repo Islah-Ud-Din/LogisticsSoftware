@@ -27,7 +27,7 @@ export default function Sidebar() {
                     { key: '/pages/dashboard', icon: <UserOutlined />, label: 'Home' },
                     { key: '/pages/sales', icon: <VideoCameraOutlined />, label: 'Sales' },
                     { key: '/pages/purchase', icon: <UploadOutlined />, label: 'Purchase' },
-                    { key: '/pages/contact', icon: <UploadOutlined />, label: 'Contact Us' },
+                    { key: '/pages/contact', icon: <UploadOutlined />, label: 'Contact' },
                 ]}
             />
 

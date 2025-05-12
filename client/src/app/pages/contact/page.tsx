@@ -8,25 +8,29 @@ import { useRouter } from 'next/navigation';
 import HeaderFunc from '@/app/components/Header/header';
 import Sidebar from '@/app/components/sidebar/sidebar';
 
-
-
 const Contact = () => {
     // router
     const router = useRouter();
 
     return (
         <>
-        <HeaderFunc />
+            <HeaderFunc />
 
-        <div className="row">
-            <div className="col-lg-2">
-                <Sidebar />
+            <div className="row">
+                <div className="col-lg-2">
+                    <Sidebar />
+                </div>
+                <div className="col-lg-10">
+                    <h2>Contact</h2>
+                    <p>
+                        <strong>Contact Us</strong>
+                        <br />
+                        <strong>Email:</strong>
+                    </p>
+
+                </div>
             </div>
-            <div className="col-lg-10">
-                <h2>Contact</h2>
-            </div>
-        </div>
-    </>
+        </>
     );
 };
 
