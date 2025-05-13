@@ -1,14 +1,10 @@
 'use client';
 import React, { useState, useRef } from 'react';
-import { Table } from 'antd';
-import type { TableColumnsType, TableProps } from 'antd';
+import { Table, Button, Input, Popconfirm, Tag } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
-import classNames from 'classnames';
-
 import HeaderFunc from '@/app/components/Header/header';
 import Sidebar from '@/app/components/sidebar/sidebar';
-
-type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
 interface DataType {
     key: React.Key;
@@ -17,28 +13,20 @@ interface DataType {
     description: string;
     amount: number;
     status: string;
+    tags: string[];
 }
 
 const Sale: React.FC = () => {
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [dataSource, setDataSource] = useState<DataType[]>([]);
-    const [selectedCell, setSelectedCell] = useState<{ rowIndex: number; columnKey: keyof DataType } | null>(null);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]); // Store selected row keys
+    const [searchText, setSearchText] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
-    const rowSelection: TableRowSelection<DataType> = {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
-    };
 
     const handleAddSale = () => {
         fileInputRef.current?.click();
     };
 
+    // Handle file upload
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -58,6 +46,7 @@ const Sale: React.FC = () => {
                 description: item.description || '',
                 amount: Number(item.amount) || 0,
                 status: item.status || 'Pending',
+                tags: item.tags ? item.tags.split(',') : ['Pending'], // Handling multiple tags
             }));
 
             setDataSource(parsedData);
@@ -66,63 +55,78 @@ const Sale: React.FC = () => {
         reader.readAsArrayBuffer(file);
     };
 
-    const handleAddDelete = () => {
-        if (selectedCell) {
-            const updated = [...dataSource];
-            updated[selectedCell.rowIndex][selectedCell.columnKey] = '' as any;
-            setDataSource(updated);
-            setSelectedCell(null);
-        }
+    // Handle delete for selected rows
+    const handleDeleteSelected = () => {
+        const newData = dataSource.filter((item) => !selectedRowKeys.includes(item.key));
+        setDataSource(newData);
+        setSelectedRowKeys([]); // Reset selected row keys after deletion
     };
 
-    const getCellClass = (rowIndex: number, columnKey: keyof DataType) => {
-        return classNames({
-            'selected-cell': selectedCell?.rowIndex === rowIndex && selectedCell?.columnKey === columnKey,
-        });
-    };
-
-    const columns: TableColumnsType<DataType> = [
+    // Columns with sorting and tags
+    const columns = [
         {
             title: 'ID',
             dataIndex: 'id',
-            onCell: (_, rowIndex) => ({
-                onClick: () => setSelectedCell({ rowIndex: rowIndex!, columnKey: 'id' }),
-                className: getCellClass(rowIndex!, 'id'),
-            }),
+            filteredValue: searchText ? [searchText] : null,
+            onFilter: (value: string, record: DataType) => record.id.includes(value),
+            filterSearch: true,
+            filterMode: 'menu',
+            sorter: (a: DataType, b: DataType) => a.id.localeCompare(b.id), // Sorting by ID
+            render: (text: string) => <span>{text}</span>,
         },
         {
             title: 'Name',
             dataIndex: 'name',
-            onCell: (_, rowIndex) => ({
-                onClick: () => setSelectedCell({ rowIndex: rowIndex!, columnKey: 'name' }),
-                className: getCellClass(rowIndex!, 'name'),
-            }),
+            filteredValue: searchText ? [searchText] : null,
+            onFilter: (value: string, record: DataType) => record.name.toLowerCase().includes(value.toLowerCase()),
+            filterSearch: true,
+            filterMode: 'menu',
+            sorter: (a: DataType, b: DataType) => a.name.localeCompare(b.name), // Sorting by Name
+            render: (text: string) => <span>{text}</span>,
         },
         {
             title: 'Description',
             dataIndex: 'description',
-            onCell: (_, rowIndex) => ({
-                onClick: () => setSelectedCell({ rowIndex: rowIndex!, columnKey: 'description' }),
-                className: getCellClass(rowIndex!, 'description'),
-            }),
+            render: (text: string) => <span>{text}</span>,
         },
         {
             title: 'Amount',
             dataIndex: 'amount',
-            onCell: (_, rowIndex) => ({
-                onClick: () => setSelectedCell({ rowIndex: rowIndex!, columnKey: 'amount' }),
-                className: getCellClass(rowIndex!, 'amount'),
-            }),
+            sorter: (a: DataType, b: DataType) => a.amount - b.amount, // Sorting by Amount
+            render: (text: number) => <span>{text}</span>,
         },
         {
             title: 'Status',
             dataIndex: 'status',
-            onCell: (_, rowIndex) => ({
-                onClick: () => setSelectedCell({ rowIndex: rowIndex!, columnKey: 'status' }),
-                className: getCellClass(rowIndex!, 'status'),
-            }),
+            render: (text: string) => <span>{text}</span>,
+        },
+        {
+            title: 'Tags',
+            dataIndex: 'tags',
+            render: (tags: string[]) => (
+                <>
+                    {tags.map((tag, index) => (
+                        <Tag color="blue" key={index}>
+                            {tag}
+                        </Tag>
+                    ))}
+                </>
+            ),
         },
     ];
+
+    // Search handler
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(e.target.value);
+    };
+
+    // Row selection configuration
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (selectedRowKeys: React.Key[]) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+    };
 
     return (
         <>
@@ -136,19 +140,16 @@ const Sale: React.FC = () => {
                         <h2>Sale Content</h2>
                         <p>Sale Content</p>
                     </div>
+
                     <div className="sales-actions">
                         <button className="btn btn-primary" onClick={handleAddSale}>
                             Add Sale
                         </button>
 
-                        <button className="btn btn-danger" onClick={handleAddDelete}>
-                            Delete Cell
-                        </button>
+                        <Button className="btn btn-danger" onClick={handleDeleteSelected} disabled={selectedRowKeys.length === 0}>
+                            Delete Selected Rows
+                        </Button>
 
-
-                        <button className="btn btn-danger" onClick={handleAddDelete}>
-                            Delete Cell
-                        </button>
                         <input
                             type="file"
                             accept=".xlsx, .xls, .csv"
@@ -157,21 +158,29 @@ const Sale: React.FC = () => {
                             onChange={handleFileChange}
                         />
                     </div>
+
+                    {/* Search Bar */}
+                    <Input
+                        placeholder="Search by ID or Name"
+                        value={searchText}
+                        onChange={handleSearch}
+                        prefix={<SearchOutlined />}
+                        style={{ marginBottom: 16, width: '300px' }}
+                    />
+
+                    {/* Ant Design Table with filters */}
                     <Table<DataType>
-                        rowSelection={rowSelection}
                         columns={columns}
                         dataSource={dataSource}
                         pagination={{ pageSize: 10 }}
+                        rowKey="key"
+                        rowSelection={rowSelection} // Enable row selection
+                        defaultSortOrder="ascend"
                     />
+
+                    {/* Button to delete selected rows */}
                 </div>
             </div>
-
-            <style jsx>{`
-                .selected-cell {
-                    background-color: #ffd6d6 !important;
-                    cursor: pointer;
-                }
-            `}</style>
         </>
     );
 };
