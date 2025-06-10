@@ -32,13 +32,18 @@ const pool = new Pool({
 });
 
 // Test database connection
-pool.connect((err, client, release) => {
-    if (err) {
-        return console.error('Error connecting to database', err.stack);
+const DbConnection = async () => {
+    let client;
+    try {
+        client = await pool.connect();
+        console.log('Connected to PostgreSQL database');
+    } catch (err) {
+        console.error('Error connecting to database', err.stack);
+    } finally {
+        if (client) client.release();
     }
-    console.log('Connected to PostgreSQL database');
-    release();
-});
+};
+
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
@@ -155,7 +160,6 @@ app.post('/api/login', async (req, res) => {
 });
 
 
-
 // API Verify Token Endpoint
 app.post('/api/verify-otp', async (req, res) => {
     const { email, token } = req.body;
@@ -199,6 +203,9 @@ app.post('/api/verify-otp', async (req, res) => {
 });
 
 
+
+
+DbConnection();
 
 // Start the server
 const PORT = process.env.PORT;

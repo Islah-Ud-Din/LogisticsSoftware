@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { UserProvider } from '@/context/UserContext';
-
+import { Provider } from 'react-redux';
 // import HeaderFunc from '@/app/components/Header/header';
+import store from '@/redux/store';
 
 import './assets/css/style.css';
 
@@ -19,7 +20,12 @@ export default function RootLayout({
         <html lang="en">
             <body style={{ minHeight: '100vh' }}>
                 {/* <HeaderFunc /> */}
-                <UserProvider>{children}</UserProvider>
+
+
+                <Provider store={store}> >
+                    {children}
+                </Provider>
+                {/* <UserProvider>{children}</UserProvider> */}
             </body>
         </html>
     );
