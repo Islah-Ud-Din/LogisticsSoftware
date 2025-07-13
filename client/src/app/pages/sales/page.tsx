@@ -2,7 +2,6 @@
 import React, { useState, useRef } from 'react';
 import { Table, Button, Input, Popconfirm, Tag } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import * as XLSX from 'xlsx';
 import HeaderFunc from '@/app/components/Header/header';
 import Sidebar from '@/app/components/sidebar/sidebar';
 
@@ -186,3 +185,4 @@ const Sale: React.FC = () => {
 };
 
 export default Sale;
+

@@ -203,8 +203,6 @@ app.post('/api/verify-otp', async (req, res) => {
 });
 
 
-
-
 DbConnection();
 
 // Start the server
