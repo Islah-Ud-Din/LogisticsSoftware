@@ -9,6 +9,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const { host } = require('pg/lib/defaults');
 const calculations = require('./calulation');
+const { console } = require('inspector');
 
 const app = express();
 app.get('/', (req, res) => {
@@ -40,6 +41,18 @@ pool.connect((err, client, release) => {
     release();
 });
 
+/*-------------------------------------------------------------------
+    user Stats
+--------------------------------------------------------------------*/
+app.post('/api/sale', async (req, res) => {
+    console.log('Parsed Data:', req.body);
+});
+
+
+/*-------------------------------------------------------------------
+    This is for Login and Registration API
+--------------------------------------------------------------------*/
+
 // Email transporter setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -58,7 +71,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     try {
-        const userExist = await pool.query('SELECT * FROM register_users WHERE email = $1', [email]);
+        const userExist = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
         if (userExist.rows.length > 0) {
             return res.status(400).json({ message: 'Email already in use!' });
@@ -70,7 +83,7 @@ app.post('/api/register', async (req, res) => {
 
         // Insert into DB with OTP + expiry + is_verified = false
         await pool.query(
-            `INSERT INTO register_users
+            `INSERT INTO users
              (first_name, last_name, email, password, country, otp, otp_expiry, is_verified)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
             [
@@ -102,7 +115,6 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-
 // Example route: Add a user
 app.post('/api/login', async (req, res) => {
     try {
@@ -112,8 +124,8 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ message: 'Email and password are required' });
         }
 
-        // Check if user exists in the register_users table
-        const userResult = await pool.query('SELECT * FROM register_users WHERE email = $1', [email]);
+        // Check if user exists in the users table
+        const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
         if (userResult.rows.length === 0) {
             console.log('User not found');
@@ -135,7 +147,7 @@ app.post('/api/login', async (req, res) => {
         const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_SECRET, { expiresIn: '7d' });
 
         // Optionally save the refresh token
-        await pool.query('UPDATE register_users SET refresh_token = $1 WHERE id = $2', [refreshToken, user.id]);
+        await pool.query('UPDATE users SET refresh_token = $1 WHERE id = $2', [refreshToken, user.id]);
         console.log('Updated refresh token for user:', user.id); // Debugging output
 
         // Set refresh token in HTTP-only cookie
@@ -154,8 +166,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-
-
 // API Verify Token Endpoint
 app.post('/api/verify-otp', async (req, res) => {
     const { email, token } = req.body;
@@ -164,7 +174,7 @@ app.post('/api/verify-otp', async (req, res) => {
 
     try {
         // Query to get the OTP and OTP expiry date from the DB
-        const { rows } = await pool.query('SELECT otp, otp_expiry FROM register_users WHERE email = $1', [email]);
+        const { rows } = await pool.query('SELECT otp, otp_expiry FROM users WHERE email = $1', [email]);
 
         if (rows.length === 0) {
             return res.status(400).json({ message: 'User not found' });
@@ -186,7 +196,7 @@ app.post('/api/verify-otp', async (req, res) => {
 
         // Update user as verified and clear OTP
         await pool.query(
-            'UPDATE register_users SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE email = $1',
+            'UPDATE users SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE email = $1',
             [email]
         );
 
@@ -197,8 +207,6 @@ app.post('/api/verify-otp', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
-
 
 // Start the server
 const PORT = process.env.PORT;

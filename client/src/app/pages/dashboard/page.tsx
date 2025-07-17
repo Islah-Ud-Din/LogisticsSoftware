@@ -22,6 +22,11 @@ import { ArrowUpOutlined, ArrowRightOutlined, ArrowDownOutlined } from '@ant-des
 import HeaderFunc from '@/app/components/Header/header';
 import Sidebar from '@/app/components/sidebar/sidebar';
 
+
+// Import GLOBAL VAL
+import useUser from '@/context/UserContext';
+
+
 // Hooks
 import useAuth from '@/hooks/useAuth';
 
@@ -49,6 +54,11 @@ const DashBoard = () => {
     const [showAll, setShowAll] = useState(false);
     const visibleStocks = showAll ? stocks : stocks.slice(0, 5);
     const authToken = useAuth();
+
+    const { user } = useUser();
+    console.log('User:', user);
+
+
 
     if (!authToken) {
         return null;

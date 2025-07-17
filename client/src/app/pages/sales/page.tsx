@@ -6,6 +6,9 @@ import * as XLSX from 'xlsx';
 import HeaderFunc from '@/app/components/Header/header';
 import Sidebar from '@/app/components/sidebar/sidebar';
 
+// Custom Hook
+import { useApi } from '../../../hooks/useApi';
+
 interface DataType {
     key: React.Key;
     id: string;
@@ -17,9 +20,15 @@ interface DataType {
 }
 
 const Sale: React.FC = () => {
+    // States
     const [dataSource, setDataSource] = useState<DataType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]); // Store selected row keys
     const [searchText, setSearchText] = useState<string>('');
+
+    // API Hook
+    const { postRequest } = useApi();
+
+    // Reference
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAddSale = () => {
@@ -27,29 +36,41 @@ const Sale: React.FC = () => {
     };
 
     // Handle file upload
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event) => {
-            const data = new Uint8Array(event.target?.result as ArrayBuffer);
-            const workbook = XLSX.read(data, { type: 'array' });
 
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
+        reader.onload = async (event) => {
+            try {
+                const data = new Uint8Array(event.target?.result as ArrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
 
-            const parsedData: DataType[] = jsonData.map((item, index) => ({
-                key: index,
-                id: item.id || `ID-${Date.now()}-${index}`,
-                name: item.name || '',
-                description: item.description || '',
-                amount: Number(item.amount) || 0,
-                status: item.status || 'Pending',
-                tags: item.tags ? item.tags.split(',') : ['Pending'], // Handling multiple tags
-            }));
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
 
-            setDataSource(parsedData);
+                const parsedData: DataType[] = jsonData.map((item, index) => ({
+                    key: index,
+                    id: item.id || `ID-${Date.now()}-${index}`,
+                    name: item.name || '',
+                    description: item.description || '',
+                    amount: Number(item.amount) || 0,
+                    tags: item.tags ? item.tags.split(',') : ['Pending'],
+                }));
+
+                setDataSource(parsedData);
+
+                // Make API request after parsing
+                const response = await postRequest<{ accessToken: string }>('/api/sale', parsedData);
+                console.log('Response:', response);
+            } catch (err: any) {
+                if (err?.response?.status === 404 || err?.response?.data?.message === 'User not found') {
+                    console.error('User not found');
+                } else {
+                    console.error('Upload error:', err);
+                }
+            }
         };
 
         reader.readAsArrayBuffer(file);
@@ -97,11 +118,6 @@ const Sale: React.FC = () => {
         },
         {
             title: 'Status',
-            dataIndex: 'status',
-            render: (text: string) => <span>{text}</span>,
-        },
-        {
-            title: 'Tags',
             dataIndex: 'tags',
             render: (tags: string[]) => (
                 <>

@@ -24,7 +24,7 @@ interface LoginFormValues {
 
 const Login: React.FC = () => {
     const router = useRouter();
-    const { setAuthToken } = useUser();
+    const { setUser } = useUser();
     const { postRequest } = useApi();
 
     const handleLogin = async (values: LoginFormValues) => {
@@ -32,7 +32,7 @@ const Login: React.FC = () => {
             const response = await postRequest<{ accessToken: string }>('/api/login', values);
 
             if (response.accessToken) {
-                setAuthToken(response.accessToken);
+                setUser(response.accessToken);
                 localStorage.setItem('authToken', response.accessToken);
                 router.push('/pages/dashboard');
             }
