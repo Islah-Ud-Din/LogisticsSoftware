@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 
 app.use(
     cors({
-        origin: 'http://localhost:3000', // Allow frontend requests
+        origin: 'http://localhost:3001', // Allow frontend requests
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true, // Allow cookies (for auth)
@@ -33,13 +33,18 @@ const pool = new Pool({
 });
 
 // Test database connection
-pool.connect((err, client, release) => {
-    if (err) {
-        return console.error('Error connecting to database', err.stack);
+const DbConnection = async () => {
+    let client;
+    try {
+        client = await pool.connect();
+        console.log('Connected to PostgreSQL database');
+    } catch (err) {
+        console.error('Error connecting to database', err.stack);
+    } finally {
+        if (client) client.release();
     }
-    console.log('Connected to PostgreSQL database');
-    release();
-});
+};
+
 
 /*-------------------------------------------------------------------
     user Stats
@@ -65,6 +70,8 @@ const transporter = nodemailer.createTransport({
 // API Register Endpoint
 app.post('/api/register', async (req, res) => {
     const { firstName, lastName, email, password, country } = req.body;
+
+    console.log(req.body, 'testing')
 
     if (!firstName || !lastName || !email || !password || !country) {
         return res.status(400).json({ message: 'All fields are required!' });
@@ -120,6 +127,7 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        console.log(req.body, 'Login Testing')
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
         }
@@ -207,6 +215,9 @@ app.post('/api/verify-otp', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+DbConnection();
 
 // Start the server
 const PORT = process.env.PORT;
