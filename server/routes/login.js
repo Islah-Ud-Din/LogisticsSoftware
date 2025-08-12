@@ -1,77 +1,30 @@
-require('dotenv').config();
-
 const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
+const router = express.Router();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const { host } = require('pg/lib/defaults');
-const calculations = require('./calulation');
-const { console } = require('inspector');
 
-const app = express();
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
-});
+// DB Connection
+const { pool } = require('./db.js');
 
-app.use(
-    cors({
-        origin: 'http://localhost:3600', // Allow frontend requests
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true, // Allow cookies (for auth)
-    })
-);
-
-app.use(express.json());
-
-// PostgreSQL connection pool
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
-
-// Test database connection
-const DbConnection = async () => {
-    let client;
-    try {
-        client = await pool.connect();
-        console.log('Connected to PostgreSQL database');
-    } catch (err) {
-        console.error('Error connecting to database', err.stack);
-    } finally {
-        if (client) client.release();
-    }
-};
-
-
-/*-------------------------------------------------------------------
-    user Stats
---------------------------------------------------------------------*/
-app.post('/api/sale', async (req, res) => {
-    console.log('Parsed Data:', req.body);
-});
-
-
-/*-------------------------------------------------------------------
-    This is for Login and Registration API
---------------------------------------------------------------------*/
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'islahuddin795@gmail.com',
-        pass: 'hutj oeqz lykq iont', // Use the app password generated for SMTP
+        pass: 'hutj oeqz lykq iont',
     },
 });
 
+// --------------------------------------------------------------------------------------------------------------------
 // API Register Endpoint
-app.post('/api/register', async (req, res) => {
+// --------------------------------------------------------------------------------------------------------------------
+router.post('/register', async (req, res) => {
     const { firstName, lastName, email, password, country } = req.body;
 
-    console.log(req.body, 'testing')
+    console.log(req.body, 'testing');
 
     if (!firstName || !lastName || !email || !password || !country) {
         return res.status(400).json({ message: 'All fields are required!' });
@@ -93,16 +46,7 @@ app.post('/api/register', async (req, res) => {
             `INSERT INTO users
              (first_name, last_name, email, password, country, otp, otp_expiry, is_verified)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-            [
-                firstName,
-                lastName,
-                email,
-                hashedPassword,
-                country,
-                otp,
-                otpExpiry,
-                false,
-            ]
+            [firstName, lastName, email, hashedPassword, country, otp, otpExpiry, false]
         );
 
         // Send OTP
@@ -117,17 +61,19 @@ app.post('/api/register', async (req, res) => {
 
         res.status(200).json({ message: 'Registration successful! Please verify your email.' });
     } catch (error) {
-        console.error("Registration error:", error.message);
+        console.error('Registration error:', error.message);
         res.status(500).json({ message: 'Registration failed. Please try again.' });
     }
 });
 
+// --------------------------------------------------------------------------------------------------------------------
 // Example route: Add a user
-app.post('/api/login', async (req, res) => {
+// --------------------------------------------------------------------------------------------------------------------
+router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        console.log(req.body, 'Login Testing')
+        console.log(req.body, 'Login Testing');
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
         }
@@ -174,8 +120,10 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// --------------------------------------------------------------------------------------------------------------------
 // API Verify Token Endpoint
-app.post('/api/verify-otp', async (req, res) => {
+// --------------------------------------------------------------------------------------------------------------------
+router.post('/verify-otp', async (req, res) => {
     const { email, token } = req.body;
 
     console.log('Email received:', email); // Log email to verify input
@@ -203,10 +151,7 @@ app.post('/api/verify-otp', async (req, res) => {
         }
 
         // Update user as verified and clear OTP
-        await pool.query(
-            'UPDATE users SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE email = $1',
-            [email]
-        );
+        await pool.query('UPDATE users SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE email = $1', [email]);
 
         res.status(200).json({ message: 'OTP verified successfully' });
     } catch (err) {
@@ -216,11 +161,4 @@ app.post('/api/verify-otp', async (req, res) => {
     }
 });
 
-
-DbConnection();
-
-// Start the server
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+module.exports = router;
