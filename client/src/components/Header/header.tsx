@@ -5,8 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Layout, Menu, Input, Badge, Button } from 'antd';
 import { BellOutlined, SearchOutlined } from '@ant-design/icons';
 import Image from 'next/image';
-import logo from '../../assets/images/svg/logo.svg';
 import { useUser } from '@/context/UserContext';
+
+// Public
+import logo from '../../../public/images/svg/logo.svg';
 
 const { Header } = Layout;
 

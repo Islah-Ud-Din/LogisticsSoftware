@@ -2,8 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { Table, Button, Input, Popconfirm, Tag } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import HeaderFunc from '@/app/components/Header/header';
-import Sidebar from '@/app/components/sidebar/sidebar';
+import HeaderFunc from '@/components/Header/header';
+import Sidebar from '@/components/sidebar/sidebar';
 
 // Custom Hook
 import { useApi } from '../../../hooks/useApi';
@@ -201,4 +201,3 @@ const Sale: React.FC = () => {
 };
 
 export default Sale;
-

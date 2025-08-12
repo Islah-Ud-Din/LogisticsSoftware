@@ -18,9 +18,9 @@ import {
 } from 'chart.js';
 import { ArrowUpOutlined, ArrowRightOutlined, ArrowDownOutlined } from '@ant-design/icons';
 
-// Components
-import HeaderFunc from '@/app/components/Header/header';
-import Sidebar from '@/app/components/sidebar/sidebar';
+// Componentsc
+import HeaderFunc from '@/components/Header/header';
+import Sidebar from '@/components/sidebar/sidebar';
 
 // Import GLOBAL VAL
 import { useUser } from '@/context/UserContext';

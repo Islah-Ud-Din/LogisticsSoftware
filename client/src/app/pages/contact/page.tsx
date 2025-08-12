@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Component
-import HeaderFunc from '@/app/components/Header/header';
-import Sidebar from '@/app/components/sidebar/sidebar';
+import HeaderFunc from '@/components/Header/header';
+import Sidebar from '@/components/sidebar/sidebar';
 
 const Contact = () => {
     // router

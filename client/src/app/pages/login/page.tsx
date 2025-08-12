@@ -12,8 +12,7 @@ import { useUser } from '@/context/UserContext';
 import { useApi } from '../../../hooks/useApi';
 
 // Assets
-import MainMockup from '../../assets/images/svg/login.svg';
-import Logo from '../../assets/images/svg/logo.svg';
+import Logo from 'Images/svg/logo.svg';
 
 const { Title, Link } = Typography;
 
@@ -53,12 +52,12 @@ const Login: React.FC = () => {
                 <div className="row align-items-center">
                     <div className="col-lg-6 signup-left mb-5 mb-lg-0" style={{ paddingRight: '40px' }}>
                         <div className="sl-logo d-flex align-items-center mb-3">
-                            <Image className="img-fluid" src={Logo} alt="Logo" width={40} height={40} />
+                            <Image className="img-fluid" src="Images/svg/logo.svg" alt="Logo" width={40} height={40} />
                             <h3 style={{ marginLeft: '10px' }}>TravelSol</h3>
                         </div>
 
                         <h2 className="mb-5">Your place to work, Plan, Create, Control</h2>
-                        <Image className="img-fluid" src={MainMockup} alt="Main" width={500} height={500} />
+                        <Image className="img-fluid" src="Images/svg/login.svg" alt="Main" width={500} height={500} />
                     </div>
 
                     <div className="col-lg-6 login-content" style={{ paddingLeft: '40px', maxWidth: '500px', width: '100%' }}>

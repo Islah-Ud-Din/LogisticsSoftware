@@ -4,8 +4,8 @@ import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Layout, theme } from 'antd';
 
 // Component
-import HeaderFunc from '@/app/components/Header/header';
-import Sidebar from '@/app/components/sidebar/sidebar';
+import HeaderFunc from '@/components/Header/header';
+import Sidebar from '@/components/sidebar/sidebar';
 // Hooks
 import useAuth from '@/hooks/useAuth';
 

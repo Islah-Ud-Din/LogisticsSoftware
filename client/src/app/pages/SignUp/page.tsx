@@ -6,17 +6,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 // Comp
-import VerifyOtp from '../../components/verify/VerifyOtp';
+import VerifyOtp from '../../../components/verify/VerifyOtp';
 
 // Ant Design Lib
 import { Button, Form, Input, Select, message } from 'antd';
 
 // Axios
 import axios from 'axios';
-
-// Assests
-import MainMockup from '../../assets/images/svg/login.svg';
-import Logo from '../../assets/images/svg/logo.svg';
 
 const { Option } = Select;
 
@@ -63,13 +59,13 @@ const SignUpPage = () => {
                 <div className="row">
                     <div className="col-lg-6 signup-left">
                         <div className="sl-logo d-flex ">
-                            <Image className="img-fluid" src={Logo} alt="Main" width={40} height={40} />
+                            <Image className="img-fluid" src="Images/svg/logo.svg" alt="Main" width={40} height={40} />
                             <h3>TravelSol</h3>
                         </div>
 
                         <h2 className="mb-5">Your place to work, Plan, Create, Control</h2>
 
-                        <Image className="img-fluid" src={MainMockup} alt="Main" width={500} height={500} />
+                        <Image className="img-fluid" src="Images/svg/login.svg" alt="Main" width={500} height={500} />
                     </div>
 
                     <div className="col-lg-5 offset-lg-1  signup-right">

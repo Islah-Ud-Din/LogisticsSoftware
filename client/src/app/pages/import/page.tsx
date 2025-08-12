@@ -5,8 +5,8 @@ import type { TableColumnsType, TableProps } from 'antd';
 import * as XLSX from 'xlsx';
 import classNames from 'classnames';
 
-import HeaderFunc from '@/app/components/Header/header';
-import Sidebar from '@/app/components/sidebar/sidebar';
+import HeaderFunc from '@/components/Header/header';
+import Sidebar from '@/components/sidebar/sidebar';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 

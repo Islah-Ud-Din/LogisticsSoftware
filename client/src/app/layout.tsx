@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { UserProvider } from '@/context/UserContext';
 
-// import HeaderFunc from '@/app/components/Header/header';
 
-import './assets/css/style.css';
+import '../../public/css/style.css';
 
 export const metadata: Metadata = {
     title: 'Business System',
