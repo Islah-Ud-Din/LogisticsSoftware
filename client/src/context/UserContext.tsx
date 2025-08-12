@@ -1,6 +1,5 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import HeaderFunc from '@/app/components/Header/header';
 
 // Define the user type
 type User = {
