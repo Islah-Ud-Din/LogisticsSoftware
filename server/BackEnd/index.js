@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 
 app.use(
     cors({
-        origin: 'http://localhost:3001', // Allow frontend requests
+        origin: 'http://localhost:3600', // Allow frontend requests
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true, // Allow cookies (for auth)
